@@ -4,7 +4,7 @@ icon: fas fa-user
 order: 4
 ---
 
-# About
+
 
 I am a cybersecurity enthusiast, particularly interested in Penetration Testing, Web Application Security, and OSINT. From time to time, my curiosity also pulls me into Reverse Engineering, but my true motivation lies in deeply exploring systems, breaking them, and understanding how they work.
 
