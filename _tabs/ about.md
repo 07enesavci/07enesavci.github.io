@@ -6,6 +6,7 @@ layout: page
 ---
 
 
+
 I am a cybersecurity enthusiast, particularly interested in Penetration Testing, Web Application Security, and OSINT. From time to time, my curiosity also pulls me into Reverse Engineering, but my true motivation lies in deeply exploring systems, breaking them, and understanding how they work.
 
 I actively participate in CTF competitions because solving complex challenges not only sharpens my skills but also keeps the journey enjoyable. Platforms such as Hackviser, TryHackMe, and HackTheBox are my training grounds, where I discover new attack vectors and experiment with unconventional techniques.
