@@ -5,6 +5,7 @@ tags: [web-security, sqli, pentest, database]
 author: "07enesavci"
 ---
 
+
 # SQL Injection (SQLi) Nedir?
 
 SQL Injection (SQLi), web uygulamalarının veritabanı sorgularını kullanıcı girdisiyle doğrudan oluşturması sonucu ortaya çıkan, saldırganın veritabanına kötü amaçlı SQL kodu enjekte etmesine imkan tanıyan kritik bir zafiyettir. Hedefler bilgi sızdırma, veri manipülasyonu, kimlik doğrulama baypası veya hatta sistem ele geçirme olabilir.
