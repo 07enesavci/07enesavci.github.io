@@ -17,34 +17,30 @@ SQL Injection (SQLi), web uygulamalarının veritabanı sorgularını kullanıc�
 ---
 
 ## İçerik
-1. [SQLi Türleri (Detaylı)](#1-sqli-türleri-detaylı)  
-    1.1 [In-band SQLi](#11-in-band-sqli)  
-        - [Error-based SQLi](#error-based-sqli)  
-        - [Union-based SQLi](#union-based-sqli)  
-    1.2 [Blind SQLi](#12-blind-sqli)  
-        - [Boolean-based](#boolean-based-blind)  
-        - [Time-based](#time-based-blind)  
-    1.3 [Out-of-Band (OOB) SQLi](#13-out-of-band-oob-sqli)  
-    1.4 [Second-Order SQLi](#14-second-order-sqli)  
-    1.5 [Stacked Queries](#15-stacked-queries)  
-2. [Veritabanı-Özgü Payload Örnekleri](#2-veritabanı-özgü-payload-örnekleri)  
-3. [Pratik İstismar Senaryoları](#3-pratik-istismar-senaryoları)  
-4. [Tespit & Test Yöntemleri](#4-tespit--test-yöntemleri)  
-5. [Korunma / Mitigasyon](#5-korunma--mitigasyon)  
-6. [Raporlama & Etik](#6-raporlama--etik)  
-7. [CTF / Eğitim İpuçları](#7-ctf--eğitim-ipuçları)  
-8. [Hızlı Payload Özeti](#8-hızlı-payload-özeti)  
-9. [İleri Seviye Savunma & İzleme](#9-ileri-seviye-savunma--izleme)  
-10. [Sonuç](#10-sonuç)  
-11. [Kaynaklar](#11-kaynaklar)  
+
+1. SQLi türleri (In-band, Blind, OOB, Second-order, Stacked queries)  
+2. Her tür için örnek payload’lar ve açıklamalar  
+3. Veritabanı-özgü payload örnekleri (MySQL, MSSQL, PostgreSQL, Oracle)  
+4. Pratik istismar senaryoları  
+5. Tespit & test yöntemleri  
+6. Korunma/mitigasyon  
+7. Raporlama ve etik  
+8. CTF ipuçları  
+9. Hızlı payload özeti  
+10. İleri seviye savunma & izleme  
+11. Sonuç ve kaynaklar  
 
 ---
 
 ## 1) SQLi Türleri (Detaylı)
 
 ### 1.1 In-band SQLi
+Sonuçların doğrudan uygulama yanıtında görülebildiği türdür.  
 
 #### Error-based SQLi
+Veritabanı hata mesajları kullanılarak bilgi çıkarılır.
+
+**Örnek payload’lar:**
 ```sql
 ' OR 1=1 --
 ' OR '1'='1' #
