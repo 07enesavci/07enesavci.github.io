@@ -48,3 +48,5 @@ SQL Injection (SQLi), web uygulamalarının veritabanı sorgularını kullanıc�
 ```sql
 ' OR 1=1 --
 ' OR '1'='1' #
+
+
