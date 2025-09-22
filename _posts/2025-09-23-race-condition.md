@@ -18,4 +18,4 @@ Race condition, birden fazla işlemin aynı kaynağa eş zamanlı erişmesi sonu
 2. Güvenlikte tipik örnekler (ör. banka transferi, kupon kullanımı, dosya yükleme)  
 3. Tespit yöntemleri (manuel test, Burp Intruder, script)  
 4. Korunma yolları (lock mekanizması, transaction, atomic işlemler)  
-5. CTF/lab örnekleri  
+5. CTF/lab örnekleri
