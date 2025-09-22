@@ -48,5 +48,4 @@ SQL Injection (SQLi), web uygulamalarının veritabanı sorgularını kullanıc�
 ```sql
 ' OR 1=1 --
 ' OR '1'='1' #
-
-
+' AND (SELECT 1 FROM (SELECT COUNT(*), CONCAT((SELECT @@version),FLOOR(RAND()*2)) x FROM information_schema.tables GROUP BY x) a) --
