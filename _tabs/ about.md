@@ -25,16 +25,16 @@ When I am not busy with payloads, exploits, or OSINT trails, you will probably f
 
 ## Education
 
-**Undergraduate Education**  
-*Ahi Evran University*  
+### Undergraduate Education  
+#### *Ahi Evran University*  
 - Programming  
 - Data Structures and Algorithms  
 - Computer Networks  
 - Linux  
 - Web Development  
 
-**Cyber Security Student**  
-*Türkiye Siber Vatan*  
+### Cyber Security Student  
+#### *Türkiye Siber Vatan*  
 - Penetration Testing  
 - Web Application Security  
 - Network Security  
