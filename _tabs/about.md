@@ -13,3 +13,22 @@ I actively participate in CTF competitions because solving complex challenges no
 At my university, I am a member of the Network and Cybersecurity Club. I take part in events, share knowledge, and encourage my peers to learn by doing. Working with like-minded individuals further boosts my motivation to explore the offensive side of security.
 
 When I am not busy with payloads, exploits, or OSINT trails, you will probably find me analyzing logs, experimenting on Linux, or planning my next CTF sprint. Breaking things on purpose—and then fixing them—is my way of learning.
+
+### Skills
+- Penetration Testing  
+- Web Application Security  
+- Python scripting and automation  
+- Linux (System Administration and Hardening)  
+- Computer Networking  
+- OSINT  
+- Reporting
+
+## Education
+
+**Undergraduate Education**  
+*Ahi Evran University* 
+- Programming, Data Structures and Algorithms, Computer Networks, Linux, Web Development
+- 
+- - **Cyber Security Student**  
+*Türkiye Siber Vatan*  
+-Penetration Testing, Web Application Security, Network Security, Reverse Engineering & Malware Analysis  
