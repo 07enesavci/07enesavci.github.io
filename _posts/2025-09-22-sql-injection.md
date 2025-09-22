@@ -16,8 +16,6 @@ SQL Injection (SQLi), web uygulamalarının veritabanı sorgularını kullanıc�
 
 ---
 
-
-
 ## İçerik
 1. [SQLi Türleri (Detaylı)](#1-sqli-türleri-detaylı)  
     1.1 [In-band SQLi](#11-in-band-sqli)  
