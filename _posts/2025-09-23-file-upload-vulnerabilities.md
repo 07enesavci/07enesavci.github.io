@@ -58,8 +58,8 @@ Dosya yükleme fonksiyonalitesi; profil fotoğrafları, doküman paylaşımı, r
 - Magic-byte ve uzantı uyuşmazlıkları  
 - Erişim geçmişi izleme  
 - Canary file / honeypot  
-- AV & sandbox scanning  
-
+- AV & sandbox scanning
+- 
 ---
 
 ## 4) Güvenli Tasarım ve Uygulama Prensipleri {#guvenli-tasarim}
