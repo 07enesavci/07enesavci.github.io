@@ -1,4 +1,4 @@
-# 07enesavci
+# CyEn07
 
 Siber güvenlik ve İHA/SİHA (insansız hava aracı) sistemleri üzerine kişisel
 blog. Sade, hızlı ve bağımlılığı olmayan bir Jekyll temasıyla yazılmıştır

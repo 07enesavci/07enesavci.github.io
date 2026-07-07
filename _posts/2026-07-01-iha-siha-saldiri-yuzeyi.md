@@ -2,7 +2,7 @@
 title: "İHA/SİHA Sistemlerinde Siber Güvenliğe Giriş: Saldırı Yüzeyi"
 date: 2026-07-01 10:00:00 +0300
 tags: [iha, siha, uav-security, drone, siber-guvenlik]
-author: 07enesavci
+author: CyEn07
 ---
 
 İnsansız hava araçları (İHA) ve silahlı/gözlem amaçlı SİHA sistemleri artık

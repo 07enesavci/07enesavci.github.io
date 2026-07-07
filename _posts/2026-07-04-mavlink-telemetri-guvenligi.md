@@ -2,7 +2,7 @@
 title: "MAVLink Protokolü ve Telemetri Güvenliği"
 date: 2026-07-04 10:00:00 +0300
 tags: [mavlink, iha, telemetri, protokol-guvenligi, siber-guvenlik]
-author: 07enesavci
+author: CyEn07
 ---
 
 Bir önceki yazıda İHA/SİHA sistemlerinin genel saldırı yüzeyine değinmiştik.

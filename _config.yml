@@ -5,7 +5,7 @@
 lang: tr
 timezone: Europe/Istanbul
 
-title: 07enesavci
+title: CyEn07
 tagline: "Siber Güvenlik & İHA/SİHA Sistemleri"
 description: >-
   Siber güvenlik, sızma testi ve İHA/SİHA (insansız hava aracı) sistemleri
@@ -16,11 +16,12 @@ description: >-
 url: "https://07enesavci.github.io"
 baseurl: ""
 
-# Terminal prompt shown in the homepage hero, e.g. root@07enesavci:~#
-prompt_user: "07enesavci"
+# Terminal prompt shown in the homepage hero, e.g. root@CyEn07:~#
+prompt_user: "CyEn07"
 
 author:
-  name: "07enesavci"
+  name: "Muhammet Enes Avcı"
+  nick: "CyEn07"
   email: "" # kendi e-posta adresini ekle
 
 social:
