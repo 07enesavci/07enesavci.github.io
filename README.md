@@ -1,4 +1,4 @@
-# 07enesavci.dev
+# 07enesavci
 
 Siber güvenlik ve İHA/SİHA (insansız hava aracı) sistemleri üzerine kişisel
 blog. Sade, hızlı ve bağımlılığı olmayan bir Jekyll temasıyla yazılmıştır
