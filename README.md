@@ -1,43 +1,82 @@
-# Chirpy Starter
+# 07enesavci.dev
 
-[![Gem Version](https://img.shields.io/gem/v/jekyll-theme-chirpy)][gem]&nbsp;
-[![GitHub license](https://img.shields.io/github/license/cotes2020/chirpy-starter.svg?color=blue)][mit]
+Siber güvenlik ve İHA/SİHA (insansız hava aracı) sistemleri üzerine kişisel
+blog. Sade, hızlı ve bağımlılığı olmayan bir Jekyll temasıyla yazılmıştır
+(harici tema gem'i veya build aracı gerekmez).
 
-When installing the [**Chirpy**][chirpy] theme through [RubyGems.org][gem], Jekyll can only read files in the folders
-`_data`, `_layouts`, `_includes`, `_sass` and `assets`, as well as a small part of options of the `_config.yml` file
-from the theme's gem. If you have ever installed this theme gem, you can use the command
-`bundle info --path jekyll-theme-chirpy` to locate these files.
-
-The Jekyll team claims that this is to leave the ball in the user’s court, but this also results in users not being
-able to enjoy the out-of-the-box experience when using feature-rich themes.
-
-To fully use all the features of **Chirpy**, you need to copy the other critical files from the theme's gem to your
-Jekyll site. The following is a list of targets:
+## Yerelde çalıştırma
 
 ```shell
-.
-├── _config.yml
-├── _plugins
-├── _tabs
-└── index.html
+bundle install
+bundle exec jekyll s
 ```
 
-To save you time, and also in case you lose some files while copying, we extract those files/configurations of the
-latest version of the **Chirpy** theme and the [CD][CD] workflow to here, so that you can start writing in minutes.
+Site varsayılan olarak <http://127.0.0.1:4000> adresinde açılır.
 
-## Usage
+## Yeni bir yazı ekleme
 
-Check out the [theme's docs](https://github.com/cotes2020/jekyll-theme-chirpy/wiki).
+`_posts/` klasörüne `YYYY-AA-GG-yazi-basligi.md` formatında bir dosya ekle:
 
-## Contributing
+```markdown
+---
+title: "Yazının Başlığı"
+date: 2026-07-07 10:00:00 +0300
+tags: [etiket1, etiket2]
+author: 07enesavci
+---
 
-This repository is automatically updated with new releases from the theme repository. If you encounter any issues or want to contribute to its improvement, please visit the [theme repository][chirpy] to provide feedback.
+Yazının içeriği buraya...
+```
 
-## License
+- Dosya adındaki tarih, yazının URL'ini etkilemez; sadece front matter'daki
+  `date` alanı ve dosya adının başındaki tarih Jekyll tarafından okunur.
+- Yazı otomatik olarak `/posts/:baslik/` adresinde yayınlanır (`:baslik`,
+  dosya adından tarih çıkarıldıktan sonraki kısımdır).
+- `tags:` alanına eklediğin etiketler otomatik olarak `/tags/` sayfasında
+  gruplanır.
+- Ana sayfada en yeni 5 yazı listelenir (`_config.yml` içindeki
+  `home_posts_limit` ile değiştirilebilir).
 
-This work is published under [MIT][mit] License.
+## Site ayarları
 
-[gem]: https://rubygems.org/gems/jekyll-theme-chirpy
-[chirpy]: https://github.com/cotes2020/jekyll-theme-chirpy/
-[CD]: https://en.wikipedia.org/wiki/Continuous_deployment
-[mit]: https://github.com/cotes2020/chirpy-starter/blob/master/LICENSE
+Tüm genel ayarlar `_config.yml` içinde:
+
+- `title`, `tagline`, `description` — site başlığı ve açıklaması
+- `prompt_user` — ana sayfadaki `root@...:~#` terminal başlığında görünen ad
+- `social.github` / `social.x` / `social.linkedin` / `social.email` — footer
+  ve ana sayfadaki sosyal medya bağlantıları (boş bırakılan alanlar
+  gösterilmez)
+- `nav` — üst menüdeki sekmeler
+
+## Sayfa yapısı
+
+```
+_config.yml       # Site ayarları
+_layouts/         # default, home, post, page şablonları
+_includes/        # header, footer, head, ikonlar
+_posts/           # Blog yazıları
+assets/css/       # Tek parça stylesheet (main.css)
+assets/js/        # Tema geçişi + mobil menü scripti
+index.html        # Ana sayfa (layout: home)
+posts.html        # /posts/  — tüm yazılar
+tags.html          # /tags/   — etikete göre gruplanmış yazılar
+archives.html      # /archives/ — yıla göre gruplanmış yazılar
+about.md           # /about/  — hakkında sayfası
+```
+
+## Yayınlama
+
+`main` dalına yapılan her push, `.github/workflows/pages-deploy.yml`
+içindeki GitHub Actions iş akışını tetikler; site derlenip GitHub Pages'e
+otomatik olarak yayınlanır.
+
+## Yasal Uyarı
+
+Bu blogtaki tüm içerikler yalnızca eğitim amaçlıdır. Anlatılan teknikleri
+yalnızca izinli olduğunuz sistemlerde uygulayınız.
+
+## Lisans
+
+Bu iş [MIT][mit] lisansı altında yayınlanmıştır.
+
+[mit]: LICENSE

@@ -1,0 +1,29 @@
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href="{{ '/' | relative_url }}" class="brand">{{ site.title }}</a>
+
+    <button id="menu-btn" class="menu-btn" aria-label="Menüyü Aç" aria-expanded="false" aria-controls="nav-menu">
+      <span class="icon menu-icon-open">{% include icons.html id="menu" %}</span>
+      <span class="icon menu-icon-close">{% include icons.html id="close" %}</span>
+    </button>
+
+    <nav id="nav-menu" class="nav">
+      <ul>
+        {% for item in site.nav %}
+        <li><a href="{{ item.url | relative_url }}"{% if page.url == item.url %} class="active" aria-current="page"{% endif %}>{{ item.title }}</a></li>
+        {% endfor %}
+        <li>
+          <a href="{{ '/rss.xml' | relative_url }}" class="icon-link" title="RSS Feed" aria-label="RSS Feed" target="_blank" rel="noopener noreferrer">
+            {% include icons.html id="rss" %}
+          </a>
+        </li>
+        <li>
+          <button id="theme-btn" class="icon-link theme-btn" title="Temayı değiştir" aria-label="Temayı değiştir">
+            <span class="icon icon-sun">{% include icons.html id="sun" %}</span>
+            <span class="icon icon-moon">{% include icons.html id="moon" %}</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,16 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0e12">
+<link rel="icon" type="image/svg+xml" href="{{ '/assets/favicon.svg' | relative_url }}">
+<link rel="canonical" href="{{ page.url | absolute_url }}">
+<link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/rss.xml' | absolute_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+{% seo %}
+{% feed_meta %}
+<script>
+  (function () {
+    var stored = localStorage.getItem("theme");
+    var theme = stored || "dark";
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>

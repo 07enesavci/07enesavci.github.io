@@ -1,0 +1,23 @@
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="socials">
+      {% if site.social.github and site.social.github != "" %}
+      <a href="https://github.com/{{ site.social.github }}" title="GitHub" aria-label="GitHub" target="_blank" rel="noopener noreferrer">{% include icons.html id="github" %}</a>
+      {% endif %}
+      {% if site.social.x and site.social.x != "" %}
+      <a href="https://x.com/{{ site.social.x }}" title="X (Twitter)" aria-label="X (Twitter)" target="_blank" rel="noopener noreferrer">{% include icons.html id="x" %}</a>
+      {% endif %}
+      {% if site.social.linkedin and site.social.linkedin != "" %}
+      <a href="https://linkedin.com/in/{{ site.social.linkedin }}" title="LinkedIn" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">{% include icons.html id="linkedin" %}</a>
+      {% endif %}
+      {% if site.social.email and site.social.email != "" %}
+      <a href="mailto:{{ site.social.email }}" title="E-posta" aria-label="E-posta">{% include icons.html id="mail" %}</a>
+      {% endif %}
+    </div>
+    <div class="copyright">
+      <span>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</span>
+      <span class="sep">&middot;</span>
+      <span>Eğitim ve yetkili güvenlik testi amaçlıdır.</span>
+    </div>
+  </div>
+</footer>

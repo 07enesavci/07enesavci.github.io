@@ -1,0 +1,28 @@
+---
+layout: default
+title: Etiketler
+permalink: /tags/
+---
+<section class="posts-index">
+  <h1>Etiketler</h1>
+
+  {% assign all_tags = site.tags | sort %}
+  {% if all_tags.size == 0 %}
+  <p>Henüz etiketlenmiş bir yazı yok.</p>
+  {% endif %}
+
+  {% for tag in all_tags %}
+  <div class="tag-group" id="{{ tag[0] | slugify }}">
+    <h3>#{{ tag[0] }} <span class="tag-count">({{ tag[1].size }})</span></h3>
+    <ul>
+      {% assign posts = tag[1] | sort: "date" | reverse %}
+      {% for post in posts %}
+      <li>
+        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d %b %Y" }}</time>
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</section>
