@@ -4,19 +4,17 @@ title: Hakkında
 permalink: /about/
 ---
 
-Merhaba, ben **Muhammet Enes Avcı** (nick: **CyEn07**). Siber güvenlik ve
-İHA/SİHA (insansız hava aracı) sistemleri üzerine çalışan bir güvenlik
-meraklısıyım.
+Merhaba, ben **Muhammet Enes Avcı** (nick: **CyEn07**). Siber güvenlik
+üzerine çalışan bir güvenlik meraklısıyım; özellikle web uygulama güvenliği
+ve yapay zeka / LLM güvenliği ilgi alanlarımın başında geliyor.
 
 Bu blogda paylaştığım konular kabaca şunları kapsıyor:
 
-- Web uygulama güvenliği ve sızma testi teknikleri (SQLi, CSRF, business
-  logic zafiyetleri vb.)
-- İHA/SİHA sistemlerinin saldırı yüzeyi (RF/telemetri, yer kontrol istasyonu,
-  firmware)
-- ROS/ROS2 tabanlı haberleşme mimarilerinin güvenliği
-- Sürü (swarm) İHA sistemlerinde güvenlik ve dayanıklılık
-- Otonom sistemlerde GPS spoofing / jamming gibi tehditler
+- Web uygulama güvenliği ve sızma testi teknikleri (SQLi, XSS, CSRF, SSRF,
+  command injection, dosya yükleme, broken access control / IDOR)
+- Business logic / mantık hataları ve race condition zafiyetleri
+- LLM ve yapay zeka güvenliği (prompt injection, AI hacking, ajan sistemleri)
+- Ağ güvenliği (segmentasyon, MITM, keşif ve savunma)
 - Genel siber güvenlik notları ve CTF çözümleri
 
 ## İletişim

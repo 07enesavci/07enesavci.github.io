@@ -6,10 +6,10 @@ lang: tr
 timezone: Europe/Istanbul
 
 title: CyEn07
-tagline: "Siber Güvenlik & İHA/SİHA Sistemleri"
+tagline: "Siber Güvenlik & Uygulama Güvenliği"
 description: >-
-  Siber güvenlik, sızma testi ve İHA/SİHA (insansız hava aracı) sistemleri
-  üzerine teknik notlar ve araştırma yazıları.
+  Web uygulama güvenliği, sızma testi, yapay zeka / LLM güvenliği ve ağ
+  güvenliği üzerine teknik notlar ve araştırma yazıları.
 
 # Set this to your GitHub Pages URL, e.g. "https://07enesavci.github.io"
 # (no trailing slash)
