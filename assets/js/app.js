@@ -1,6 +1,22 @@
 (function () {
   "use strict";
 
+  // ---- Eski tema kalintilarini temizle (Chirpy service worker + cache) ----
+  // Onceki tema bir PWA service worker'i kaydettiyse, ziyaretcinin tarayicisi
+  // F5'siz eski sayfayi sunmaya devam edebilir. Bunlari kaldirip cache'i bosalt.
+  try {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (r) { r.unregister(); });
+      }).catch(function () {});
+    }
+    if (window.caches && caches.keys) {
+      caches.keys().then(function (keys) {
+        keys.forEach(function (k) { caches.delete(k); });
+      }).catch(function () {});
+    }
+  } catch (e) {}
+
   // ---- Theme toggle ----
   var root = document.documentElement;
   var themeBtn = document.getElementById("theme-btn");

@@ -142,6 +142,8 @@
         ["whoami", "hakkinda bilgisi"],
         ["social", "sosyal medya baglantilari"],
         ["theme", "koyu/acik tema arasinda gecis yapar"],
+        ["skin <ad>", "renk temasi degistir (skins ile listele)"],
+        ["skins", "kullanilabilir renk temalarini listeler"],
         ["banner", "acilis banner'ini tekrar gosterir"],
         ["admin", "yonetim paneli (yazi/hakkinda duzenleme)"],
         ["date", "tarih ve saati yazar"],
@@ -358,6 +360,47 @@
       r.setAttribute("data-theme", current);
       try { localStorage.setItem("theme", current); } catch (e) {}
       printText("tema: " + (current === "dark" ? "koyu" : "acik"), "term-muted");
+    },
+
+    skin: function (args) {
+      var skins = ["matrix", "cyber", "synthwave", "amber", "ice", "blood"];
+      var name = (args[0] || "").toLowerCase();
+      var r = document.documentElement;
+      if (!name) {
+        printText("Aktif skin: " + (r.getAttribute("data-skin") || "matrix"), "term-muted");
+        printText("Kullanim: skin <" + skins.join(" | ") + ">", "term-muted");
+        return;
+      }
+      if (skins.indexOf(name) === -1) {
+        printText("Bilinmeyen skin: " + name + ". 'skins' ile listeyi gor.", "term-err");
+        return;
+      }
+      if (name === "matrix") r.removeAttribute("data-skin");
+      else r.setAttribute("data-skin", name);
+      try { localStorage.setItem("skin", name); } catch (e) {}
+      printText("skin -> " + name, "term-muted");
+    },
+
+    skins: function () {
+      var skins = [
+        ["matrix", "yesil (varsayilan)"],
+        ["cyber", "camgobegi / neon mavi"],
+        ["synthwave", "pembe / mor"],
+        ["amber", "retro amber CRT"],
+        ["ice", "buz mavisi"],
+        ["blood", "kirmizi"]
+      ];
+      printText("Renk temalari:", "term-title");
+      skins.forEach(function (s) {
+        printHTML(function (div) {
+          var c = document.createElement("span");
+          c.className = "term-cmd-name";
+          c.textContent = s[0];
+          div.appendChild(c);
+          div.appendChild(document.createTextNode("  " + s[1]));
+        });
+      });
+      printText("Degistir: skin <ad>", "term-muted");
     },
 
     date: function () {

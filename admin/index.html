@@ -9,9 +9,11 @@
 <style>
   body { font-size: 15px; }
   .admin-wrap { max-width: 880px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-  .admin-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; }
+  .admin-header { display: flex; align-items: center; gap: 1rem; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; }
   .admin-header h1 { font-size: 1.4rem; margin: 0; }
+  .admin-header .spacer { flex: 1; }
   .admin-header a { color: var(--muted); font-size: 0.85rem; }
+  .admin-header a:hover { color: var(--accent); }
   .panel { border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; background: var(--bg-elevated); }
   .panel h2 { font-size: 1rem; margin: 0 0 1rem; color: var(--accent); }
   .field { margin-bottom: 0.9rem; }
@@ -49,7 +51,7 @@
   button:disabled { opacity: 0.5; cursor: not-allowed; }
   .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
   .tabs button.active { background: var(--selection); }
-  #status { position: fixed; bottom: 1rem; right: 1rem; max-width: 340px; }
+  #status { position: fixed; bottom: 1rem; right: 1rem; max-width: 340px; z-index: 50; }
   .toast { border: 1px solid var(--border); background: var(--bg-elevated); border-radius: var(--radius); padding: 0.6rem 0.9rem; margin-top: 0.5rem; font-size: 0.85rem; }
   .toast.ok { border-color: var(--accent-dim); color: var(--accent); }
   .toast.err { border-color: #ff5c5c; color: #ff5c5c; }
@@ -60,7 +62,9 @@
   td.actions button { margin-right: 0.4rem; }
   #config-editor, #about-editor, #post-body { min-height: 260px; }
   .hint { color: var(--muted); font-size: 0.8rem; }
-  .conn-status { font-size: 0.85rem; margin-top: 0.5rem; }
+  .conn-status { font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2em; }
+  .lock-badge { color: var(--accent); font-size: 0.8rem; border: 1px solid var(--accent-dim); border-radius: 999px; padding: 0.15rem 0.7rem; }
+  .auth-card { max-width: 420px; margin: 4rem auto 0; }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -68,111 +72,149 @@
 <div class="admin-wrap">
   <div class="admin-header">
     <h1>~/admin</h1>
+    <span class="lock-badge" id="lock-badge" hidden>● bağlı</span>
+    <span class="spacer"></span>
+    <button class="ghost" id="btn-logout" hidden>Çıkış</button>
     <a href="/">← Siteye dön</a>
   </div>
 
-  <section class="panel" id="connect-panel">
-    <h2>Bağlantı</h2>
-    <div class="row">
-      <div class="field">
-        <label for="f-owner">GitHub kullanıcı adı</label>
-        <input type="text" id="f-owner" value="07enesavci">
-      </div>
-      <div class="field">
-        <label for="f-repo">Repo adı</label>
-        <input type="text" id="f-repo" value="07enesavci.github.io">
-      </div>
-      <div class="field">
-        <label for="f-branch">Branch</label>
-        <input type="text" id="f-branch" value="main">
-      </div>
+  <!-- ============ GİRİŞ (kasa mevcut) ============ -->
+  <section class="panel auth-card" id="login-panel" hidden>
+    <h2>Giriş</h2>
+    <div class="field">
+      <label for="l-user">Kullanıcı adı</label>
+      <input type="text" id="l-user" autocomplete="username" autocapitalize="off" spellcheck="false">
     </div>
     <div class="field">
-      <label for="f-token">Personal Access Token (fine-grained, sadece bu repo, Contents: Read and write izniyle)</label>
-      <input type="password" id="f-token" placeholder="github_pat_...">
+      <label for="l-pass">Parola</label>
+      <input type="password" id="l-pass" autocomplete="current-password">
     </div>
     <div class="row">
-      <button id="btn-connect">Bağlan</button>
-      <button class="ghost" id="btn-forget">Token'ı unut</button>
+      <button id="btn-login">Giriş yap</button>
+      <button class="ghost" id="btn-reset">Sıfırla</button>
     </div>
-    <div class="conn-status" id="conn-status"></div>
+    <div class="conn-status" id="login-status"></div>
     <p class="hint">
-      Token oluşturmak için: GitHub → Settings → Developer settings → Personal
-      access tokens → Fine-grained tokens → "Generate new token". Repository
-      access'i yalnızca bu repo ile sınırlandır, Permissions altında
-      <strong>Contents: Read and write</strong> ver. Token yalnızca bu
-      tarayıcıda saklanır, başka hiçbir yere gönderilmez.
+      Parolan hiçbir yere kaydedilmez. GitHub token'ı bu parolayla şifrelenmiş
+      olarak yalnızca bu tarayıcıda saklanır; doğru parola olmadan çözülemez.
+      "Sıfırla" kayıtlı token'ı siler ve ilk kuruluma döner.
     </p>
   </section>
 
-  <nav class="tabs" id="tabs">
-    <button data-tab="posts" class="active">Yazılar</button>
-    <button data-tab="about">Hakkımda</button>
-    <button data-tab="config">Site Ayarları</button>
-  </nav>
-
-  <section id="tab-posts">
-    <div class="panel">
-      <h2>Yazılar</h2>
-      <div id="post-list"><p class="hint">Önce bağlan.</p></div>
-    </div>
-
-    <div class="panel">
-      <h2 id="post-form-title">Yeni Yazı</h2>
-      <form id="post-form">
-        <input type="hidden" id="post-path">
-        <input type="hidden" id="post-sha">
-        <div class="field">
-          <label for="post-title">Başlık</label>
-          <input type="text" id="post-title" required>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label for="post-date">Tarih / Saat</label>
-            <input type="datetime-local" id="post-date" required>
-          </div>
-          <div class="field">
-            <label for="post-tags">Etiketler (virgülle ayır)</label>
-            <input type="text" id="post-tags" placeholder="iha, siber-guvenlik">
-          </div>
-          <div class="field">
-            <label for="post-author">Yazar</label>
-            <input type="text" id="post-author" value="CyEn07">
-          </div>
-        </div>
-        <div class="field">
-          <label for="post-body">İçerik (Markdown)</label>
-          <textarea id="post-body" required></textarea>
-        </div>
-        <div class="row">
-          <button type="submit" id="post-save">Kaydet</button>
-          <button type="button" class="ghost" id="post-cancel">Yeni yazıya sıfırla</button>
-        </div>
-      </form>
-    </div>
-  </section>
-
-  <section id="tab-about" hidden>
-    <div class="panel">
-      <h2>Hakkımda (about.md)</h2>
+  <!-- ============ İLK KURULUM (kasa yok) ============ -->
+  <section class="panel auth-card" id="setup-panel" hidden>
+    <h2>İlk Kurulum</h2>
+    <div class="row">
       <div class="field">
-        <textarea id="about-editor"></textarea>
+        <label for="s-owner">GitHub kullanıcı adı</label>
+        <input type="text" id="s-owner" value="07enesavci">
       </div>
-      <button id="about-save">Kaydet</button>
-      <p class="hint">Front matter (--- ... ---) dahil tüm dosya içeriğini düzenliyorsun, dikkatli ol.</p>
+      <div class="field">
+        <label for="s-repo">Repo adı</label>
+        <input type="text" id="s-repo" value="07enesavci.github.io">
+      </div>
+      <div class="field">
+        <label for="s-branch">Branch</label>
+        <input type="text" id="s-branch" value="main">
+      </div>
     </div>
+    <div class="row">
+      <div class="field">
+        <label for="s-user">Panel kullanıcı adı</label>
+        <input type="text" id="s-user" value="cyen07" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="s-pass">Panel parolası (belirle)</label>
+        <input type="password" id="s-pass" autocomplete="new-password">
+      </div>
+    </div>
+    <div class="field">
+      <label for="s-token">GitHub token (fine-grained, sadece bu repo, Contents: Read and write)</label>
+      <input type="password" id="s-token" placeholder="github_pat_...">
+    </div>
+    <button id="btn-setup">Kaydet ve gir</button>
+    <div class="conn-status" id="setup-status"></div>
+    <p class="hint">
+      Token oluşturmak için: GitHub → Settings → Developer settings → Personal
+      access tokens → Fine-grained tokens → "Generate new token". Repository
+      access'i yalnızca bu repo ile sınırla, Permissions altında
+      <strong>Contents: Read and write</strong> ver. Belirlediğin parola
+      token'ı bu tarayıcıda şifreler; parola hiçbir yerde saklanmaz, kaybedersen
+      token'ı yeniden girmen gerekir.
+    </p>
   </section>
 
-  <section id="tab-config" hidden>
-    <div class="panel">
-      <h2>Site Ayarları (_config.yml)</h2>
-      <div class="field">
-        <textarea id="config-editor"></textarea>
+  <!-- ============ PANEL (giriş sonrası) ============ -->
+  <div id="admin-body" hidden>
+    <nav class="tabs" id="tabs">
+      <button data-tab="posts" class="active">Yazılar</button>
+      <button data-tab="about">Hakkımda</button>
+      <button data-tab="config">Site Ayarları</button>
+    </nav>
+
+    <section id="tab-posts">
+      <div class="panel">
+        <h2>Yazılar</h2>
+        <div id="post-list"><p class="hint">Yükleniyor...</p></div>
       </div>
-      <button id="config-save">Kaydet</button>
-      <p class="hint">YAML formatına dikkat et; girinti/boşluk hataları build'i bozabilir.</p>
-    </div>
-  </section>
+
+      <div class="panel">
+        <h2 id="post-form-title">Yeni Yazı</h2>
+        <form id="post-form">
+          <input type="hidden" id="post-path">
+          <input type="hidden" id="post-sha">
+          <div class="field">
+            <label for="post-title">Başlık</label>
+            <input type="text" id="post-title" required>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="post-date">Tarih / Saat</label>
+              <input type="datetime-local" id="post-date" required>
+            </div>
+            <div class="field">
+              <label for="post-tags">Etiketler (virgülle ayır)</label>
+              <input type="text" id="post-tags" placeholder="iha, siber-guvenlik">
+            </div>
+            <div class="field">
+              <label for="post-author">Yazar</label>
+              <input type="text" id="post-author" value="CyEn07">
+            </div>
+          </div>
+          <div class="field">
+            <label for="post-body">İçerik (Markdown)</label>
+            <textarea id="post-body" required></textarea>
+          </div>
+          <div class="row">
+            <button type="submit" id="post-save">Kaydet</button>
+            <button type="button" class="ghost" id="post-cancel">Yeni yazıya sıfırla</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section id="tab-about" hidden>
+      <div class="panel">
+        <h2>Hakkımda (about.md)</h2>
+        <div class="field">
+          <textarea id="about-editor"></textarea>
+        </div>
+        <button id="about-save">Kaydet</button>
+        <p class="hint">Front matter (--- ... ---) dahil tüm dosya içeriğini düzenliyorsun, dikkatli ol.</p>
+      </div>
+    </section>
+
+    <section id="tab-config" hidden>
+      <div class="panel">
+        <h2>Site Ayarları (_config.yml)</h2>
+        <div class="field">
+          <textarea id="config-editor"></textarea>
+        </div>
+        <button id="config-save">Kaydet</button>
+        <p class="hint">YAML formatına dikkat et; girinti/boşluk hataları build'i bozabilir.</p>
+      </div>
+    </section>
+  </div>
 </div>
 
 <div id="status"></div>
@@ -185,12 +227,14 @@
   var state = { owner: "", repo: "", branch: "main", token: "" };
   var aboutSha = null, configSha = null;
 
+  function $(id) { return document.getElementById(id); }
+
   // ---------- utils ----------
   function toast(msg, kind) {
     var el = document.createElement("div");
     el.className = "toast " + (kind || "ok");
     el.textContent = msg;
-    document.getElementById("status").appendChild(el);
+    $("status").appendChild(el);
     setTimeout(function () { el.remove(); }, 6000);
   }
 
@@ -208,6 +252,19 @@
     return new TextDecoder().decode(bytes);
   }
 
+  function bytesToB64(bytes) {
+    var s = "";
+    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    return btoa(s);
+  }
+
+  function b64ToBytes(b64) {
+    var bin = atob(b64);
+    var b = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+    return b;
+  }
+
   function slugify(str) {
     var map = { "ı": "i", "İ": "i", "ş": "s", "Ş": "s", "ğ": "g", "Ğ": "g", "ü": "u", "Ü": "u", "ö": "o", "Ö": "o", "ç": "c", "Ç": "c" };
     var s = str.split("").map(function (ch) { return map[ch] !== undefined ? map[ch] : ch; }).join("");
@@ -216,6 +273,47 @@
     return s || "yazi";
   }
 
+  // ---------- crypto (token'i parolayla sifrele) ----------
+  function deriveKey(password, salt) {
+    return crypto.subtle.importKey(
+      "raw", new TextEncoder().encode(password), { name: "PBKDF2" }, false, ["deriveKey"]
+    ).then(function (km) {
+      return crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: salt, iterations: 150000, hash: "SHA-256" },
+        km,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    });
+  }
+
+  function encryptSecret(password, plain) {
+    var salt = crypto.getRandomValues(new Uint8Array(16));
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    return deriveKey(password, salt).then(function (key) {
+      return crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, new TextEncoder().encode(plain));
+    }).then(function (ct) {
+      return { salt: bytesToB64(salt), iv: bytesToB64(iv), ct: bytesToB64(new Uint8Array(ct)) };
+    });
+  }
+
+  function decryptSecret(password, blob) {
+    return deriveKey(password, b64ToBytes(blob.salt)).then(function (key) {
+      return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64ToBytes(blob.iv) }, key, b64ToBytes(blob.ct));
+    }).then(function (pt) {
+      return new TextDecoder().decode(pt);
+    });
+  }
+
+  // ---------- vault ----------
+  function loadVault() {
+    try { return JSON.parse(localStorage.getItem("admin_vault")); } catch (e) { return null; }
+  }
+  function saveVault(v) { localStorage.setItem("admin_vault", JSON.stringify(v)); }
+  function clearVault() { localStorage.removeItem("admin_vault"); sessionStorage.removeItem("admin_tok"); }
+
+  // ---------- github ----------
   function ghHeaders() {
     return {
       "Authorization": "Bearer " + state.token,
@@ -304,59 +402,126 @@
     return m ? (m[1] + "T" + m[2]) : "";
   }
 
-  // ---------- connection ----------
-  function loadStoredConn() {
-    var s = localStorage.getItem("admin_conn");
-    if (!s) return;
-    try {
-      var v = JSON.parse(s);
-      document.getElementById("f-owner").value = v.owner || document.getElementById("f-owner").value;
-      document.getElementById("f-repo").value = v.repo || document.getElementById("f-repo").value;
-      document.getElementById("f-branch").value = v.branch || "main";
-      document.getElementById("f-token").value = v.token || "";
-    } catch (e) {}
+  // ---------- auth flow ----------
+  function showSetup() {
+    $("login-panel").hidden = true;
+    $("setup-panel").hidden = false;
+    $("admin-body").hidden = true;
+    $("btn-logout").hidden = true;
+    $("lock-badge").hidden = true;
   }
 
-  function connect() {
-    state.owner = document.getElementById("f-owner").value.trim();
-    state.repo = document.getElementById("f-repo").value.trim();
-    state.branch = document.getElementById("f-branch").value.trim() || "main";
-    state.token = document.getElementById("f-token").value.trim();
+  function showLogin(vault) {
+    $("setup-panel").hidden = true;
+    $("login-panel").hidden = false;
+    $("admin-body").hidden = true;
+    $("btn-logout").hidden = true;
+    $("lock-badge").hidden = true;
+    if (vault && vault.user) $("l-user").value = vault.user;
+    $("l-pass").focus();
+  }
 
-    var statusEl = document.getElementById("conn-status");
-    if (!state.token) {
-      statusEl.textContent = "Token gerekli.";
-      statusEl.style.color = "#ff5c5c";
+  function enterPanel() {
+    $("login-panel").hidden = true;
+    $("setup-panel").hidden = true;
+    $("admin-body").hidden = false;
+    $("btn-logout").hidden = false;
+    $("lock-badge").hidden = false;
+    refreshPosts();
+  }
+
+  function doLogin() {
+    var vault = loadVault();
+    if (!vault) { showSetup(); return; }
+    var user = $("l-user").value.trim();
+    var pass = $("l-pass").value;
+    var st = $("login-status");
+    if (user !== vault.user) {
+      st.textContent = "Kullanıcı adı veya parola hatalı.";
+      st.style.color = "#ff5c5c";
       return;
     }
-
-    statusEl.textContent = "Bağlanıyor...";
-    fetch(API + "/repos/" + state.owner + "/" + state.repo, { headers: ghHeaders() })
-      .then(function (res) {
-        if (!res.ok) throw new Error("Repo bulunamadı veya token yetersiz (" + res.status + ")");
-        return res.json();
-      })
-      .then(function () {
-        statusEl.textContent = "Bağlandı: " + state.owner + "/" + state.repo + " (" + state.branch + ")";
-        statusEl.style.color = "var(--accent)";
-        localStorage.setItem("admin_conn", JSON.stringify(state));
-        refreshPosts();
-      })
-      .catch(function (err) {
-        statusEl.textContent = err.message;
-        statusEl.style.color = "#ff5c5c";
-      });
+    st.textContent = "Kontrol ediliyor...";
+    st.style.color = "var(--muted)";
+    decryptSecret(pass, vault.enc).then(function (token) {
+      state.owner = vault.conn.owner;
+      state.repo = vault.conn.repo;
+      state.branch = vault.conn.branch || "main";
+      state.token = token;
+      sessionStorage.setItem("admin_tok", token);
+      st.textContent = "";
+      $("l-pass").value = "";
+      enterPanel();
+    }).catch(function () {
+      st.textContent = "Kullanıcı adı veya parola hatalı.";
+      st.style.color = "#ff5c5c";
+    });
   }
 
-  function forget() {
-    localStorage.removeItem("admin_conn");
-    document.getElementById("f-token").value = "";
-    document.getElementById("conn-status").textContent = "Token unutuldu.";
+  function doSetup() {
+    var owner = $("s-owner").value.trim();
+    var repo = $("s-repo").value.trim();
+    var branch = $("s-branch").value.trim() || "main";
+    var user = $("s-user").value.trim() || "cyen07";
+    var pass = $("s-pass").value;
+    var token = $("s-token").value.trim();
+    var st = $("setup-status");
+
+    if (!pass || pass.length < 4) { st.textContent = "Parola en az 4 karakter olmalı."; st.style.color = "#ff5c5c"; return; }
+    if (!token) { st.textContent = "GitHub token gerekli."; st.style.color = "#ff5c5c"; return; }
+
+    st.textContent = "Token doğrulanıyor...";
+    st.style.color = "var(--muted)";
+    state.owner = owner; state.repo = repo; state.branch = branch; state.token = token;
+
+    fetch(API + "/repos/" + owner + "/" + repo, { headers: ghHeaders() }).then(function (res) {
+      if (!res.ok) throw new Error("Repo bulunamadı veya token yetersiz (" + res.status + ")");
+      return encryptSecret(pass, token);
+    }).then(function (enc) {
+      saveVault({ user: user, conn: { owner: owner, repo: repo, branch: branch }, enc: enc });
+      sessionStorage.setItem("admin_tok", token);
+      st.textContent = "";
+      $("s-pass").value = ""; $("s-token").value = "";
+      enterPanel();
+      toast("Kurulum tamam. Bir dahaki sefere sadece kullanıcı adı + parola.");
+    }).catch(function (err) {
+      st.textContent = err.message;
+      st.style.color = "#ff5c5c";
+    });
+  }
+
+  function logout() {
+    sessionStorage.removeItem("admin_tok");
+    state.token = "";
+    aboutSha = null; configSha = null;
+    showLogin(loadVault());
+  }
+
+  function resetVault() {
+    if (!confirm("Kayıtlı token silinecek ve ilk kuruluma dönülecek. Emin misin?")) return;
+    clearVault();
+    state.token = "";
+    showSetup();
+  }
+
+  function routeAuth() {
+    var vault = loadVault();
+    if (!vault) { showSetup(); return; }
+    var tok = sessionStorage.getItem("admin_tok");
+    if (tok) {
+      state.owner = vault.conn.owner;
+      state.repo = vault.conn.repo;
+      state.branch = vault.conn.branch || "main";
+      state.token = tok;
+      enterPanel();
+      return;
+    }
+    showLogin(vault);
   }
 
   // ---------- posts ----------
   function refreshPosts() {
-    var listEl = document.getElementById("post-list");
+    var listEl = $("post-list");
     listEl.innerHTML = "<p class=\"hint\">Yükleniyor...</p>";
     listDir("_posts").then(function (entries) {
       var files = entries.filter(function (e) { return e.type === "file" && /\.md$/.test(e.name); });
@@ -374,30 +539,39 @@
         listEl.innerHTML = "<p class=\"hint\">Henüz yazı yok.</p>";
         return;
       }
-      var rows = posts.map(function (p) {
-        return "<tr>" +
-          "<td>" + p.title + "</td>" +
-          "<td>" + (p.date || "") + "</td>" +
-          "<td class=\"actions\">" +
-          "<button data-edit=\"" + p.path + "\">Düzenle</button>" +
-          "<button class=\"danger\" data-delete=\"" + p.path + "\" data-sha=\"" + p.sha + "\">Sil</button>" +
-          "</td></tr>";
-      }).join("");
-      listEl.innerHTML = "<table><thead><tr><th>Başlık</th><th>Tarih</th><th></th></tr></thead><tbody>" + rows + "</tbody></table>";
-
-      listEl.querySelectorAll("[data-edit]").forEach(function (btn) {
-        btn.addEventListener("click", function () { loadPostForEdit(btn.getAttribute("data-edit")); });
-      });
-      listEl.querySelectorAll("[data-delete]").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          var path = btn.getAttribute("data-delete");
-          var sha = btn.getAttribute("data-sha");
-          if (!confirm(path + " silinsin mi?")) return;
-          deleteFile(path, sha, "Yazı sil: " + path)
-            .then(function () { toast("Silindi: " + path); refreshPosts(); })
+      listEl.innerHTML = "";
+      var table = document.createElement("table");
+      table.innerHTML = "<thead><tr><th>Başlık</th><th>Tarih</th><th></th></tr></thead>";
+      var tbody = document.createElement("tbody");
+      posts.forEach(function (p) {
+        var tr = document.createElement("tr");
+        var tdTitle = document.createElement("td");
+        tdTitle.textContent = p.title;
+        var tdDate = document.createElement("td");
+        tdDate.textContent = p.date || "";
+        var tdAct = document.createElement("td");
+        tdAct.className = "actions";
+        var editBtn = document.createElement("button");
+        editBtn.textContent = "Düzenle";
+        editBtn.addEventListener("click", function () { loadPostForEdit(p.path); });
+        var delBtn = document.createElement("button");
+        delBtn.className = "danger";
+        delBtn.textContent = "Sil";
+        delBtn.addEventListener("click", function () {
+          if (!confirm(p.path + " silinsin mi?")) return;
+          deleteFile(p.path, p.sha, "Yazı sil: " + p.path)
+            .then(function () { toast("Silindi: " + p.path); refreshPosts(); })
             .catch(function (err) { toast(err.message, "err"); });
         });
+        tdAct.appendChild(editBtn);
+        tdAct.appendChild(delBtn);
+        tr.appendChild(tdTitle);
+        tr.appendChild(tdDate);
+        tr.appendChild(tdAct);
+        tbody.appendChild(tr);
       });
+      table.appendChild(tbody);
+      listEl.appendChild(table);
     }).catch(function (err) {
       listEl.innerHTML = "";
       toast(err.message, "err");
@@ -407,38 +581,38 @@
   function loadPostForEdit(path) {
     getFile(path).then(function (f) {
       var fm = parseFrontMatter(f.text);
-      document.getElementById("post-form-title").textContent = "Düzenle: " + path;
-      document.getElementById("post-path").value = path;
-      document.getElementById("post-sha").value = f.sha;
-      document.getElementById("post-title").value = fm.title;
-      document.getElementById("post-date").value = fromJekyllDate(fm.date);
-      document.getElementById("post-tags").value = fm.tags;
-      document.getElementById("post-author").value = fm.author;
-      document.getElementById("post-body").value = fm.body;
-      window.scrollTo({ top: document.getElementById("post-form").offsetTop - 20, behavior: "smooth" });
+      $("post-form-title").textContent = "Düzenle: " + path;
+      $("post-path").value = path;
+      $("post-sha").value = f.sha;
+      $("post-title").value = fm.title;
+      $("post-date").value = fromJekyllDate(fm.date);
+      $("post-tags").value = fm.tags;
+      $("post-author").value = fm.author;
+      $("post-body").value = fm.body;
+      window.scrollTo({ top: $("post-form").offsetTop - 20, behavior: "smooth" });
     }).catch(function (err) { toast(err.message, "err"); });
   }
 
   function resetPostForm() {
-    document.getElementById("post-form-title").textContent = "Yeni Yazı";
-    document.getElementById("post-path").value = "";
-    document.getElementById("post-sha").value = "";
-    document.getElementById("post-form").reset();
-    document.getElementById("post-author").value = "CyEn07";
+    $("post-form-title").textContent = "Yeni Yazı";
+    $("post-path").value = "";
+    $("post-sha").value = "";
+    $("post-form").reset();
+    $("post-author").value = "CyEn07";
     var now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    document.getElementById("post-date").value = now.toISOString().slice(0, 16);
+    $("post-date").value = now.toISOString().slice(0, 16);
   }
 
   function submitPost(ev) {
     ev.preventDefault();
-    var existingPath = document.getElementById("post-path").value;
-    var existingSha = document.getElementById("post-sha").value;
-    var title = document.getElementById("post-title").value.trim();
-    var localDate = document.getElementById("post-date").value;
-    var tags = document.getElementById("post-tags").value.trim();
-    var author = document.getElementById("post-author").value.trim() || "CyEn07";
-    var body = document.getElementById("post-body").value;
+    var existingPath = $("post-path").value;
+    var existingSha = $("post-sha").value;
+    var title = $("post-title").value.trim();
+    var localDate = $("post-date").value;
+    var tags = $("post-tags").value.trim();
+    var author = $("post-author").value.trim() || "CyEn07";
+    var body = $("post-body").value;
 
     if (!title || !localDate || !body.trim()) {
       toast("Başlık, tarih ve içerik zorunlu.", "err");
@@ -454,7 +628,7 @@
       path = "_posts/" + dateOnly + "-" + slugify(title) + ".md";
     }
 
-    var btn = document.getElementById("post-save");
+    var btn = $("post-save");
     btn.disabled = true;
     saveFile(path, content, existingSha || null, (existingPath ? "Yazı güncelle: " : "Yazı ekle: ") + title)
       .then(function () {
@@ -470,12 +644,12 @@
   function loadAbout() {
     getFile("about.md").then(function (f) {
       aboutSha = f.sha;
-      document.getElementById("about-editor").value = f.text;
+      $("about-editor").value = f.text;
     }).catch(function (err) { toast(err.message, "err"); });
   }
 
   function saveAbout() {
-    var text = document.getElementById("about-editor").value;
+    var text = $("about-editor").value;
     saveFile("about.md", text, aboutSha, "Hakkımda sayfasını güncelle")
       .then(function (res) { aboutSha = res.content.sha; toast("Hakkımda kaydedildi."); })
       .catch(function (err) { toast(err.message, "err"); });
@@ -484,12 +658,12 @@
   function loadConfig() {
     getFile("_config.yml").then(function (f) {
       configSha = f.sha;
-      document.getElementById("config-editor").value = f.text;
+      $("config-editor").value = f.text;
     }).catch(function (err) { toast(err.message, "err"); });
   }
 
   function saveConfig() {
-    var text = document.getElementById("config-editor").value;
+    var text = $("config-editor").value;
     saveFile("_config.yml", text, configSha, "Site ayarlarını güncelle")
       .then(function (res) { configSha = res.content.sha; toast("Site ayarları kaydedildi."); })
       .catch(function (err) { toast(err.message, "err"); });
@@ -503,7 +677,7 @@
         buttons.forEach(function (b) { b.classList.remove("active"); });
         btn.classList.add("active");
         ["posts", "about", "config"].forEach(function (name) {
-          document.getElementById("tab-" + name).hidden = (name !== btn.getAttribute("data-tab"));
+          $("tab-" + name).hidden = (name !== btn.getAttribute("data-tab"));
         });
         if (btn.getAttribute("data-tab") === "about" && aboutSha === null) loadAbout();
         if (btn.getAttribute("data-tab") === "config" && configSha === null) loadConfig();
@@ -512,17 +686,27 @@
   }
 
   // ---------- init ----------
-  document.getElementById("btn-connect").addEventListener("click", connect);
-  document.getElementById("btn-forget").addEventListener("click", forget);
-  document.getElementById("post-form").addEventListener("submit", submitPost);
-  document.getElementById("post-cancel").addEventListener("click", resetPostForm);
-  document.getElementById("about-save").addEventListener("click", saveAbout);
-  document.getElementById("config-save").addEventListener("click", saveConfig);
+  if (!window.crypto || !crypto.subtle) {
+    document.querySelector(".admin-wrap").innerHTML =
+      "<p style='color:#ff5c5c'>Bu tarayıcı Web Crypto desteklemiyor ya da sayfa güvenli olmayan (http) bağlantıda açıldı. Panel https üzerinden açılmalı.</p>";
+    return;
+  }
+
+  $("btn-login").addEventListener("click", doLogin);
+  $("btn-reset").addEventListener("click", resetVault);
+  $("btn-setup").addEventListener("click", doSetup);
+  $("btn-logout").addEventListener("click", logout);
+  $("l-pass").addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });
+  $("s-token").addEventListener("keydown", function (e) { if (e.key === "Enter") doSetup(); });
+
+  $("post-form").addEventListener("submit", submitPost);
+  $("post-cancel").addEventListener("click", resetPostForm);
+  $("about-save").addEventListener("click", saveAbout);
+  $("config-save").addEventListener("click", saveConfig);
 
   initTabs();
   resetPostForm();
-  loadStoredConn();
-  if (document.getElementById("f-token").value) connect();
+  routeAuth();
 })();
 </script>
 </body>

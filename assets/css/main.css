@@ -35,6 +35,35 @@
   --selection: rgba(10, 143, 92, 0.2);
 }
 
+/* ---------------- Skins (accent presetleri) ----------------
+   data-theme (koyu/acik) uzerine binen renk paletleri.
+   Varsayilan "matrix" (yesil) icin override gerekmez. */
+:root[data-skin="cyber"] {
+  --accent: #22d3ee;
+  --accent-dim: #0ea5b7;
+  --selection: rgba(34, 211, 238, 0.25);
+}
+:root[data-skin="synthwave"] {
+  --accent: #ff3ca6;
+  --accent-dim: #c026d3;
+  --selection: rgba(255, 60, 166, 0.25);
+}
+:root[data-skin="amber"] {
+  --accent: #ffb000;
+  --accent-dim: #cc8800;
+  --selection: rgba(255, 176, 0, 0.22);
+}
+:root[data-skin="ice"] {
+  --accent: #7dd3fc;
+  --accent-dim: #38bdf8;
+  --selection: rgba(125, 211, 252, 0.22);
+}
+:root[data-skin="blood"] {
+  --accent: #ff4d5e;
+  --accent-dim: #d61f3a;
+  --selection: rgba(255, 77, 94, 0.22);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -389,6 +418,45 @@ body.is-terminal {
   border-radius: 0;
   box-shadow: none;
   font-size: 0.95rem;
+  position: relative;
+}
+
+/* Futuristik CRT tarama cizgileri (cok hafif) */
+.terminal.terminal-full::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: repeating-linear-gradient(
+    rgba(127, 255, 200, 0.035) 0 1px,
+    transparent 1px 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+/* Ust kenarda ince accent parlama cizgisi */
+.terminal.terminal-full::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 4;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.7;
+  box-shadow: 0 0 12px var(--accent);
+}
+
+/* Accent metinlere neon parlama */
+.term-banner,
+.terminal-full .term-prompt {
+  text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero .prompt::after { animation: none; }
 }
 
 .terminal-full .term-output {

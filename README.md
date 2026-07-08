@@ -17,11 +17,18 @@ Site varsayılan olarak <http://127.0.0.1:4000> adresinde açılır.
 
 Ana sayfa tam ekran, çalışan bir terminal öykünücüsüdür. Ziyaretçi
 `help`, `ls`, `cd posts`, `cat <yazı>.md`, `open <yazı>.md`, `tags`, `tree`,
-`whoami`, `theme`, `admin`, `clear` gibi komutlarla blogda gezinebilir. Yazı
-verisi `_layouts/home.html` içinde Liquid ile JSON olarak gömülür ve
+`whoami`, `theme`, `skin`, `admin`, `clear` gibi komutlarla blogda gezinebilir.
+Yazı verisi `_layouts/home.html` içinde Liquid ile JSON olarak gömülür ve
 `assets/js/terminal.js` bunu tarayıcıda sanal bir dosya sistemine dönüştürür
 (sunucu gerekmez). JavaScript kapalıysa `<noscript>` içindeki klasik "Son
 Yazılar" listesi gösterilir.
+
+### Renk temaları (skins)
+
+`skins` komutu temaları listeler, `skin <ad>` ile değiştirilir: `matrix`
+(varsayılan yeşil), `cyber`, `synthwave`, `amber`, `ice`, `blood`. Seçim
+`localStorage`'da saklanır ve sonraki ziyaretlerde korunur. `theme` komutu
+koyu/açık arasında geçiş yapar.
 
 ## Admin panel (`/admin/`)
 
@@ -30,18 +37,23 @@ düzenlemeyi sağlayan, sunucusuz bir yönetim panelidir. GitHub Contents API'si
 doğrudan kullanır; değişiklikler `main` dalına commit'lenir ve GitHub Actions
 siteyi otomatik yeniden derler.
 
-Kullanım:
+**İlk kurulum (bir kere):**
 
 1. GitHub → Settings → Developer settings → Personal access tokens →
    **Fine-grained tokens** → "Generate new token".
 2. Repository access'i **yalnızca bu repo** ile sınırla, Permissions altında
    **Contents: Read and write** ver.
-3. `https://07enesavci.github.io/admin/` adresine gir, token'ı yapıştır, "Bağlan".
+3. `https://07enesavci.github.io/admin/` → "İlk Kurulum": kullanıcı adı,
+   bir panel parolası belirle ve token'ı yapıştır → "Kaydet ve gir".
 
-Token yalnızca senin tarayıcının `localStorage`'ında saklanır, başka hiçbir
-yere gönderilmez. Panel arama motorlarına kapalıdır (`noindex`), ama dosya
-herkese açıktır — güvenlik tamamen token'ın gizliliğine dayanır, token'ı
-kimseyle paylaşma.
+**Sonraki girişler:** yalnızca kullanıcı adı + parola.
+
+Güvenlik modeli: Statik sitede gerçek bir sunucu-taraflı login yoktur; bu yüzden
+parola koda gömülmez. Bunun yerine GitHub token'ı, belirlediğin parolayla
+(Web Crypto / AES-GCM + PBKDF2) **şifrelenerek** yalnızca senin tarayıcının
+`localStorage`'ında saklanır. Doğru parola girilmeden token çözülemez, dolayısıyla
+panel açılamaz ve repoya hiçbir şey yazılamaz. Asıl koruma token'ın kendisidir —
+onu kimseyle paylaşma. Panel arama motorlarına kapalıdır (`noindex`).
 
 ## Yeni bir yazı ekleme
 
