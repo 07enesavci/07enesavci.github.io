@@ -143,6 +143,7 @@
         ["social", "sosyal medya baglantilari"],
         ["theme", "koyu/acik tema arasinda gecis yapar"],
         ["banner", "acilis banner'ini tekrar gosterir"],
+        ["admin", "yonetim paneli (yazi/hakkinda duzenleme)"],
         ["date", "tarih ve saati yazar"],
         ["echo <metin>", "metni ekrana yazar"],
         ["clear", "ekrani temizler"]
@@ -371,6 +372,10 @@
       showBanner();
     },
 
+    admin: function () {
+      go("/admin/");
+    },
+
     clear: function () {
       outEl.innerHTML = "";
     },
@@ -447,6 +452,11 @@
       c2.className = "term-cmd-name";
       c2.textContent = "ls posts";
       div.appendChild(c2);
+      div.appendChild(document.createTextNode(", yonetim icin "));
+      var c3 = document.createElement("span");
+      c3.className = "term-cmd-name";
+      c3.textContent = "admin";
+      div.appendChild(c3);
       div.appendChild(document.createTextNode(" dene."));
     });
     printText("");
@@ -563,4 +573,5 @@
   // ---- Init ----
   updatePrompt();
   showBanner();
+  inputEl.focus();
 })();

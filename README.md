@@ -13,6 +13,36 @@ bundle exec jekyll s
 
 Site varsayılan olarak <http://127.0.0.1:4000> adresinde açılır.
 
+## Ana sayfa: interaktif terminal
+
+Ana sayfa tam ekran, çalışan bir terminal öykünücüsüdür. Ziyaretçi
+`help`, `ls`, `cd posts`, `cat <yazı>.md`, `open <yazı>.md`, `tags`, `tree`,
+`whoami`, `theme`, `admin`, `clear` gibi komutlarla blogda gezinebilir. Yazı
+verisi `_layouts/home.html` içinde Liquid ile JSON olarak gömülür ve
+`assets/js/terminal.js` bunu tarayıcıda sanal bir dosya sistemine dönüştürür
+(sunucu gerekmez). JavaScript kapalıysa `<noscript>` içindeki klasik "Son
+Yazılar" listesi gösterilir.
+
+## Admin panel (`/admin/`)
+
+`admin/index.html`, yazıları / hakkımda sayfasını / site ayarlarını tarayıcıdan
+düzenlemeyi sağlayan, sunucusuz bir yönetim panelidir. GitHub Contents API'sini
+doğrudan kullanır; değişiklikler `main` dalına commit'lenir ve GitHub Actions
+siteyi otomatik yeniden derler.
+
+Kullanım:
+
+1. GitHub → Settings → Developer settings → Personal access tokens →
+   **Fine-grained tokens** → "Generate new token".
+2. Repository access'i **yalnızca bu repo** ile sınırla, Permissions altında
+   **Contents: Read and write** ver.
+3. `https://07enesavci.github.io/admin/` adresine gir, token'ı yapıştır, "Bağlan".
+
+Token yalnızca senin tarayıcının `localStorage`'ında saklanır, başka hiçbir
+yere gönderilmez. Panel arama motorlarına kapalıdır (`noindex`), ama dosya
+herkese açıktır — güvenlik tamamen token'ın gizliliğine dayanır, token'ı
+kimseyle paylaşma.
+
 ## Yeni bir yazı ekleme
 
 `_posts/` klasörüne `YYYY-AA-GG-yazi-basligi.md` formatında bir dosya ekle:

@@ -1,28 +1,23 @@
 ---
 layout: default
 ---
-<section class="hero">
-  <div id="terminal" class="terminal" data-user="visitor" data-host="{{ site.prompt_user | default: site.title | downcase }}" tabindex="0">
-    <div class="term-bar" aria-hidden="true">
-      <span class="term-dot term-dot-red"></span>
-      <span class="term-dot term-dot-yellow"></span>
-      <span class="term-dot term-dot-green"></span>
-      <span class="term-bar-title">{{ site.prompt_user | default: site.title | downcase }}@web ~ bash</span>
-    </div>
-    <div id="term-output" class="term-output" aria-live="polite"></div>
-    <form id="term-form" class="term-input-line" autocomplete="off">
-      <label for="term-input" id="term-prompt" class="term-prompt"></label>
-      <input id="term-input" class="term-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Terminal komut girişi" />
-    </form>
+<div id="terminal" class="terminal terminal-full" data-user="visitor" data-host="{{ site.prompt_user | default: site.title | downcase }}" tabindex="0">
+  <div class="term-bar" aria-hidden="true">
+    <span class="term-dot term-dot-red"></span>
+    <span class="term-dot term-dot-yellow"></span>
+    <span class="term-dot term-dot-green"></span>
+    <span class="term-bar-title">{{ site.prompt_user | default: site.title | downcase }}@web ~ bash</span>
+    <span class="term-bar-links">
+      <a href="{{ '/posts/' | relative_url }}" title="Yazılar (klasik görünüm)">yazılar</a>
+      <a href="{{ '/about/' | relative_url }}" title="Hakkında">hakkında</a>
+    </span>
   </div>
-
-  <p class="term-hint">
-    İpucu: terminale <code>help</code> yazıp Enter'a bas — <code>ls</code>,
-    <code>cd posts</code>, <code>cat</code>, <code>open</code> gibi komutlar
-    çalışır. Terminali kullanmak istemezsen aşağıdan normal şekilde de
-    gezinebilirsin.
-  </p>
-</section>
+  <div id="term-output" class="term-output" aria-live="polite"></div>
+  <form id="term-form" class="term-input-line" autocomplete="off">
+    <label for="term-input" id="term-prompt" class="term-prompt"></label>
+    <input id="term-input" class="term-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Terminal komut girişi" />
+  </form>
+</div>
 
 <script id="fs-data" type="application/json">
 {
@@ -47,30 +42,22 @@ layout: default
 }
 </script>
 
-<section class="recent-posts">
-  <h2>Son Yazılar</h2>
-  <ul class="post-list">
-    {% for post in site.posts limit: site.home_posts_limit %}
-    <li>
-      <a href="{{ post.url | relative_url }}" class="post-title">{{ post.title }}</a>
-      <div class="post-meta">
-        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d %b %Y" }}</time>
-        {% if post.tags.size > 0 %}
-        <span class="tags">
-          {% for tag in post.tags %}<span class="tag">#{{ tag }}</span>{% endfor %}
-        </span>
-        {% endif %}
-      </div>
-      <p>{{ post.excerpt | strip_html | strip_newlines | truncatewords: 32 }}</p>
-    </li>
-    {% else %}
-    <li class="empty">Henüz yazı yok. <code>_posts/</code> klasörüne ilk yazını ekle.</li>
-    {% endfor %}
-  </ul>
-
-  {% if site.posts.size > 0 %}
-  <a href="{{ '/posts/' | relative_url }}" class="more-link">
-    Tüm Yazılar {% include icons.html id="arrow-right" %}
-  </a>
-  {% endif %}
-</section>
+<noscript>
+  <section class="home-fallback">
+    <h1 class="prompt">root@{{ site.prompt_user | default: site.title }}:~#</h1>
+    <p>{{ site.description }}</p>
+    <h2>Son Yazılar</h2>
+    <ul class="post-list">
+      {% for post in site.posts limit: site.home_posts_limit %}
+      <li>
+        <a href="{{ post.url | relative_url }}" class="post-title">{{ post.title }}</a>
+        <div class="post-meta">
+          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d %b %Y" }}</time>
+        </div>
+        <p>{{ post.excerpt | strip_html | strip_newlines | truncatewords: 32 }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    <a href="{{ '/posts/' | relative_url }}" class="more-link">Tüm Yazılar →</a>
+  </section>
+</noscript>

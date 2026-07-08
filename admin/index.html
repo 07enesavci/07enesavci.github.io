@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="tr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — CyEn07</title>
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+  body { font-size: 15px; }
+  .admin-wrap { max-width: 880px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .admin-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; }
+  .admin-header h1 { font-size: 1.4rem; margin: 0; }
+  .admin-header a { color: var(--muted); font-size: 0.85rem; }
+  .panel { border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; background: var(--bg-elevated); }
+  .panel h2 { font-size: 1rem; margin: 0 0 1rem; color: var(--accent); }
+  .field { margin-bottom: 0.9rem; }
+  .field label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.3rem; }
+  .field input[type="text"],
+  .field input[type="password"],
+  .field input[type="datetime-local"],
+  .field textarea,
+  .field select {
+    width: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+  }
+  .field textarea { resize: vertical; }
+  .row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .row .field { flex: 1; min-width: 180px; }
+  button {
+    font-family: var(--font-mono);
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    border-radius: var(--radius);
+    padding: 0.45rem 0.9rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  button:hover { background: var(--selection); }
+  button.danger { color: #ff5c5c; border-color: #ff5c5c; }
+  button.ghost { color: var(--muted); border-color: var(--border); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+  .tabs button.active { background: var(--selection); }
+  #status { position: fixed; bottom: 1rem; right: 1rem; max-width: 340px; }
+  .toast { border: 1px solid var(--border); background: var(--bg-elevated); border-radius: var(--radius); padding: 0.6rem 0.9rem; margin-top: 0.5rem; font-size: 0.85rem; }
+  .toast.ok { border-color: var(--accent-dim); color: var(--accent); }
+  .toast.err { border-color: #ff5c5c; color: #ff5c5c; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { text-align: left; padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: normal; }
+  td.actions { white-space: nowrap; }
+  td.actions button { margin-right: 0.4rem; }
+  #config-editor, #about-editor, #post-body { min-height: 260px; }
+  .hint { color: var(--muted); font-size: 0.8rem; }
+  .conn-status { font-size: 0.85rem; margin-top: 0.5rem; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-header">
+    <h1>~/admin</h1>
+    <a href="/">← Siteye dön</a>
+  </div>
+
+  <section class="panel" id="connect-panel">
+    <h2>Bağlantı</h2>
+    <div class="row">
+      <div class="field">
+        <label for="f-owner">GitHub kullanıcı adı</label>
+        <input type="text" id="f-owner" value="07enesavci">
+      </div>
+      <div class="field">
+        <label for="f-repo">Repo adı</label>
+        <input type="text" id="f-repo" value="07enesavci.github.io">
+      </div>
+      <div class="field">
+        <label for="f-branch">Branch</label>
+        <input type="text" id="f-branch" value="main">
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-token">Personal Access Token (fine-grained, sadece bu repo, Contents: Read and write izniyle)</label>
+      <input type="password" id="f-token" placeholder="github_pat_...">
+    </div>
+    <div class="row">
+      <button id="btn-connect">Bağlan</button>
+      <button class="ghost" id="btn-forget">Token'ı unut</button>
+    </div>
+    <div class="conn-status" id="conn-status"></div>
+    <p class="hint">
+      Token oluşturmak için: GitHub → Settings → Developer settings → Personal
+      access tokens → Fine-grained tokens → "Generate new token". Repository
+      access'i yalnızca bu repo ile sınırlandır, Permissions altında
+      <strong>Contents: Read and write</strong> ver. Token yalnızca bu
+      tarayıcıda saklanır, başka hiçbir yere gönderilmez.
+    </p>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="posts" class="active">Yazılar</button>
+    <button data-tab="about">Hakkımda</button>
+    <button data-tab="config">Site Ayarları</button>
+  </nav>
+
+  <section id="tab-posts">
+    <div class="panel">
+      <h2>Yazılar</h2>
+      <div id="post-list"><p class="hint">Önce bağlan.</p></div>
+    </div>
+
+    <div class="panel">
+      <h2 id="post-form-title">Yeni Yazı</h2>
+      <form id="post-form">
+        <input type="hidden" id="post-path">
+        <input type="hidden" id="post-sha">
+        <div class="field">
+          <label for="post-title">Başlık</label>
+          <input type="text" id="post-title" required>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="post-date">Tarih / Saat</label>
+            <input type="datetime-local" id="post-date" required>
+          </div>
+          <div class="field">
+            <label for="post-tags">Etiketler (virgülle ayır)</label>
+            <input type="text" id="post-tags" placeholder="iha, siber-guvenlik">
+          </div>
+          <div class="field">
+            <label for="post-author">Yazar</label>
+            <input type="text" id="post-author" value="CyEn07">
+          </div>
+        </div>
+        <div class="field">
+          <label for="post-body">İçerik (Markdown)</label>
+          <textarea id="post-body" required></textarea>
+        </div>
+        <div class="row">
+          <button type="submit" id="post-save">Kaydet</button>
+          <button type="button" class="ghost" id="post-cancel">Yeni yazıya sıfırla</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="tab-about" hidden>
+    <div class="panel">
+      <h2>Hakkımda (about.md)</h2>
+      <div class="field">
+        <textarea id="about-editor"></textarea>
+      </div>
+      <button id="about-save">Kaydet</button>
+      <p class="hint">Front matter (--- ... ---) dahil tüm dosya içeriğini düzenliyorsun, dikkatli ol.</p>
+    </div>
+  </section>
+
+  <section id="tab-config" hidden>
+    <div class="panel">
+      <h2>Site Ayarları (_config.yml)</h2>
+      <div class="field">
+        <textarea id="config-editor"></textarea>
+      </div>
+      <button id="config-save">Kaydet</button>
+      <p class="hint">YAML formatına dikkat et; girinti/boşluk hataları build'i bozabilir.</p>
+    </div>
+  </section>
+</div>
+
+<div id="status"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var API = "https://api.github.com";
+  var state = { owner: "", repo: "", branch: "main", token: "" };
+  var aboutSha = null, configSha = null;
+
+  // ---------- utils ----------
+  function toast(msg, kind) {
+    var el = document.createElement("div");
+    el.className = "toast " + (kind || "ok");
+    el.textContent = msg;
+    document.getElementById("status").appendChild(el);
+    setTimeout(function () { el.remove(); }, 6000);
+  }
+
+  function utf8ToBase64(str) {
+    var bytes = new TextEncoder().encode(str);
+    var binary = "";
+    for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    return btoa(binary);
+  }
+
+  function base64ToUtf8(b64) {
+    var binary = atob(b64.replace(/\n/g, ""));
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+
+  function slugify(str) {
+    var map = { "ı": "i", "İ": "i", "ş": "s", "Ş": "s", "ğ": "g", "Ğ": "g", "ü": "u", "Ü": "u", "ö": "o", "Ö": "o", "ç": "c", "Ç": "c" };
+    var s = str.split("").map(function (ch) { return map[ch] !== undefined ? map[ch] : ch; }).join("");
+    s = s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    s = s.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return s || "yazi";
+  }
+
+  function ghHeaders() {
+    return {
+      "Authorization": "Bearer " + state.token,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    };
+  }
+
+  function apiPath(path) {
+    return API + "/repos/" + state.owner + "/" + state.repo + "/contents/" + path + "?ref=" + encodeURIComponent(state.branch);
+  }
+
+  function getFile(path) {
+    return fetch(apiPath(path), { headers: ghHeaders() }).then(function (res) {
+      if (!res.ok) throw new Error(path + " okunamadı (" + res.status + ")");
+      return res.json();
+    }).then(function (data) {
+      return { sha: data.sha, text: base64ToUtf8(data.content) };
+    });
+  }
+
+  function saveFile(path, text, sha, message) {
+    var body = { message: message, content: utf8ToBase64(text), branch: state.branch };
+    if (sha) body.sha = sha;
+    return fetch(API + "/repos/" + state.owner + "/" + state.repo + "/contents/" + path, {
+      method: "PUT",
+      headers: Object.assign({ "Content-Type": "application/json" }, ghHeaders()),
+      body: JSON.stringify(body)
+    }).then(function (res) {
+      if (!res.ok) return res.json().then(function (e) { throw new Error(e.message || ("Kaydedilemedi (" + res.status + ")")); });
+      return res.json();
+    });
+  }
+
+  function deleteFile(path, sha, message) {
+    return fetch(API + "/repos/" + state.owner + "/" + state.repo + "/contents/" + path, {
+      method: "DELETE",
+      headers: Object.assign({ "Content-Type": "application/json" }, ghHeaders()),
+      body: JSON.stringify({ message: message, sha: sha, branch: state.branch })
+    }).then(function (res) {
+      if (!res.ok) return res.json().then(function (e) { throw new Error(e.message || ("Silinemedi (" + res.status + ")")); });
+    });
+  }
+
+  function listDir(path) {
+    return fetch(apiPath(path), { headers: ghHeaders() }).then(function (res) {
+      if (!res.ok) throw new Error(path + " listelenemedi (" + res.status + ")");
+      return res.json();
+    });
+  }
+
+  // ---------- front matter ----------
+  function parseFrontMatter(raw) {
+    var m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    if (!m) return { title: "", date: "", tags: "", author: "CyEn07", body: raw };
+    var fm = m[1], body = m[2];
+    function get(key) {
+      var r = fm.match(new RegExp("^" + key + ":\\s*(.*)$", "m"));
+      return r ? r[1].trim() : "";
+    }
+    var title = get("title").replace(/^"(.*)"$/, "$1");
+    var date = get("date");
+    var tagsRaw = get("tags").replace(/^\[|\]$/g, "");
+    var tags = tagsRaw.split(",").map(function (s) { return s.trim(); }).filter(Boolean).join(", ");
+    var author = get("author") || "CyEn07";
+    return { title: title, date: date, tags: tags, author: author, body: body.replace(/^\n+/, "") };
+  }
+
+  function buildPostContent(f) {
+    var tagList = f.tags.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+    var fm = [
+      "---",
+      'title: "' + f.title.replace(/"/g, '\\"') + '"',
+      "date: " + f.date,
+      "tags: [" + tagList.join(", ") + "]",
+      "author: " + f.author,
+      "---",
+      ""
+    ].join("\n");
+    return fm + f.body.trim() + "\n";
+  }
+
+  function toJekyllDate(local) { return local.replace("T", " ") + ":00 +0300"; }
+  function fromJekyllDate(d) {
+    var m = d.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})/);
+    return m ? (m[1] + "T" + m[2]) : "";
+  }
+
+  // ---------- connection ----------
+  function loadStoredConn() {
+    var s = localStorage.getItem("admin_conn");
+    if (!s) return;
+    try {
+      var v = JSON.parse(s);
+      document.getElementById("f-owner").value = v.owner || document.getElementById("f-owner").value;
+      document.getElementById("f-repo").value = v.repo || document.getElementById("f-repo").value;
+      document.getElementById("f-branch").value = v.branch || "main";
+      document.getElementById("f-token").value = v.token || "";
+    } catch (e) {}
+  }
+
+  function connect() {
+    state.owner = document.getElementById("f-owner").value.trim();
+    state.repo = document.getElementById("f-repo").value.trim();
+    state.branch = document.getElementById("f-branch").value.trim() || "main";
+    state.token = document.getElementById("f-token").value.trim();
+
+    var statusEl = document.getElementById("conn-status");
+    if (!state.token) {
+      statusEl.textContent = "Token gerekli.";
+      statusEl.style.color = "#ff5c5c";
+      return;
+    }
+
+    statusEl.textContent = "Bağlanıyor...";
+    fetch(API + "/repos/" + state.owner + "/" + state.repo, { headers: ghHeaders() })
+      .then(function (res) {
+        if (!res.ok) throw new Error("Repo bulunamadı veya token yetersiz (" + res.status + ")");
+        return res.json();
+      })
+      .then(function () {
+        statusEl.textContent = "Bağlandı: " + state.owner + "/" + state.repo + " (" + state.branch + ")";
+        statusEl.style.color = "var(--accent)";
+        localStorage.setItem("admin_conn", JSON.stringify(state));
+        refreshPosts();
+      })
+      .catch(function (err) {
+        statusEl.textContent = err.message;
+        statusEl.style.color = "#ff5c5c";
+      });
+  }
+
+  function forget() {
+    localStorage.removeItem("admin_conn");
+    document.getElementById("f-token").value = "";
+    document.getElementById("conn-status").textContent = "Token unutuldu.";
+  }
+
+  // ---------- posts ----------
+  function refreshPosts() {
+    var listEl = document.getElementById("post-list");
+    listEl.innerHTML = "<p class=\"hint\">Yükleniyor...</p>";
+    listDir("_posts").then(function (entries) {
+      var files = entries.filter(function (e) { return e.type === "file" && /\.md$/.test(e.name); });
+      return Promise.all(files.map(function (e) {
+        return getFile(e.path).then(function (f) {
+          var fm = parseFrontMatter(f.text);
+          return { path: e.path, sha: e.sha, title: fm.title || e.name, date: fm.date };
+        }).catch(function () {
+          return { path: e.path, sha: e.sha, title: e.name, date: "" };
+        });
+      }));
+    }).then(function (posts) {
+      posts.sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); });
+      if (posts.length === 0) {
+        listEl.innerHTML = "<p class=\"hint\">Henüz yazı yok.</p>";
+        return;
+      }
+      var rows = posts.map(function (p) {
+        return "<tr>" +
+          "<td>" + p.title + "</td>" +
+          "<td>" + (p.date || "") + "</td>" +
+          "<td class=\"actions\">" +
+          "<button data-edit=\"" + p.path + "\">Düzenle</button>" +
+          "<button class=\"danger\" data-delete=\"" + p.path + "\" data-sha=\"" + p.sha + "\">Sil</button>" +
+          "</td></tr>";
+      }).join("");
+      listEl.innerHTML = "<table><thead><tr><th>Başlık</th><th>Tarih</th><th></th></tr></thead><tbody>" + rows + "</tbody></table>";
+
+      listEl.querySelectorAll("[data-edit]").forEach(function (btn) {
+        btn.addEventListener("click", function () { loadPostForEdit(btn.getAttribute("data-edit")); });
+      });
+      listEl.querySelectorAll("[data-delete]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var path = btn.getAttribute("data-delete");
+          var sha = btn.getAttribute("data-sha");
+          if (!confirm(path + " silinsin mi?")) return;
+          deleteFile(path, sha, "Yazı sil: " + path)
+            .then(function () { toast("Silindi: " + path); refreshPosts(); })
+            .catch(function (err) { toast(err.message, "err"); });
+        });
+      });
+    }).catch(function (err) {
+      listEl.innerHTML = "";
+      toast(err.message, "err");
+    });
+  }
+
+  function loadPostForEdit(path) {
+    getFile(path).then(function (f) {
+      var fm = parseFrontMatter(f.text);
+      document.getElementById("post-form-title").textContent = "Düzenle: " + path;
+      document.getElementById("post-path").value = path;
+      document.getElementById("post-sha").value = f.sha;
+      document.getElementById("post-title").value = fm.title;
+      document.getElementById("post-date").value = fromJekyllDate(fm.date);
+      document.getElementById("post-tags").value = fm.tags;
+      document.getElementById("post-author").value = fm.author;
+      document.getElementById("post-body").value = fm.body;
+      window.scrollTo({ top: document.getElementById("post-form").offsetTop - 20, behavior: "smooth" });
+    }).catch(function (err) { toast(err.message, "err"); });
+  }
+
+  function resetPostForm() {
+    document.getElementById("post-form-title").textContent = "Yeni Yazı";
+    document.getElementById("post-path").value = "";
+    document.getElementById("post-sha").value = "";
+    document.getElementById("post-form").reset();
+    document.getElementById("post-author").value = "CyEn07";
+    var now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById("post-date").value = now.toISOString().slice(0, 16);
+  }
+
+  function submitPost(ev) {
+    ev.preventDefault();
+    var existingPath = document.getElementById("post-path").value;
+    var existingSha = document.getElementById("post-sha").value;
+    var title = document.getElementById("post-title").value.trim();
+    var localDate = document.getElementById("post-date").value;
+    var tags = document.getElementById("post-tags").value.trim();
+    var author = document.getElementById("post-author").value.trim() || "CyEn07";
+    var body = document.getElementById("post-body").value;
+
+    if (!title || !localDate || !body.trim()) {
+      toast("Başlık, tarih ve içerik zorunlu.", "err");
+      return;
+    }
+
+    var jekyllDate = toJekyllDate(localDate);
+    var content = buildPostContent({ title: title, date: jekyllDate, tags: tags, author: author, body: body });
+
+    var path = existingPath;
+    if (!path) {
+      var dateOnly = localDate.slice(0, 10);
+      path = "_posts/" + dateOnly + "-" + slugify(title) + ".md";
+    }
+
+    var btn = document.getElementById("post-save");
+    btn.disabled = true;
+    saveFile(path, content, existingSha || null, (existingPath ? "Yazı güncelle: " : "Yazı ekle: ") + title)
+      .then(function () {
+        toast("Kaydedildi: " + path);
+        resetPostForm();
+        refreshPosts();
+      })
+      .catch(function (err) { toast(err.message, "err"); })
+      .finally(function () { btn.disabled = false; });
+  }
+
+  // ---------- about / config ----------
+  function loadAbout() {
+    getFile("about.md").then(function (f) {
+      aboutSha = f.sha;
+      document.getElementById("about-editor").value = f.text;
+    }).catch(function (err) { toast(err.message, "err"); });
+  }
+
+  function saveAbout() {
+    var text = document.getElementById("about-editor").value;
+    saveFile("about.md", text, aboutSha, "Hakkımda sayfasını güncelle")
+      .then(function (res) { aboutSha = res.content.sha; toast("Hakkımda kaydedildi."); })
+      .catch(function (err) { toast(err.message, "err"); });
+  }
+
+  function loadConfig() {
+    getFile("_config.yml").then(function (f) {
+      configSha = f.sha;
+      document.getElementById("config-editor").value = f.text;
+    }).catch(function (err) { toast(err.message, "err"); });
+  }
+
+  function saveConfig() {
+    var text = document.getElementById("config-editor").value;
+    saveFile("_config.yml", text, configSha, "Site ayarlarını güncelle")
+      .then(function (res) { configSha = res.content.sha; toast("Site ayarları kaydedildi."); })
+      .catch(function (err) { toast(err.message, "err"); });
+  }
+
+  // ---------- tabs ----------
+  function initTabs() {
+    var buttons = document.querySelectorAll("#tabs button");
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        buttons.forEach(function (b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        ["posts", "about", "config"].forEach(function (name) {
+          document.getElementById("tab-" + name).hidden = (name !== btn.getAttribute("data-tab"));
+        });
+        if (btn.getAttribute("data-tab") === "about" && aboutSha === null) loadAbout();
+        if (btn.getAttribute("data-tab") === "config" && configSha === null) loadConfig();
+      });
+    });
+  }
+
+  // ---------- init ----------
+  document.getElementById("btn-connect").addEventListener("click", connect);
+  document.getElementById("btn-forget").addEventListener("click", forget);
+  document.getElementById("post-form").addEventListener("submit", submitPost);
+  document.getElementById("post-cancel").addEventListener("click", resetPostForm);
+  document.getElementById("about-save").addEventListener("click", saveAbout);
+  document.getElementById("config-save").addEventListener("click", saveConfig);
+
+  initTabs();
+  resetPostForm();
+  loadStoredConn();
+  if (document.getElementById("f-token").value) connect();
+})();
+</script>
+</body>
+</html>
